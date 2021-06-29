@@ -1,6 +1,6 @@
 .PHONY: lambda gcf
 
-VERSION=2.0.0
+VERSION=2.0.1
 CURRENT_DIR=$(shell pwd)
 
 lambda:
