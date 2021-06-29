@@ -52,7 +52,8 @@ def execute(request):
     request_json = request.get_json(force=True)
     if "executable" not in request_json:
         return bad_request("Missing executable value")
-    if len(request_json["executable"]) > MAX_EXECUTABLE:
+    executable = base64.b64decode(request_json["executable"])
+    if len(executable) > MAX_EXECUTABLE:
         return bad_request("Executable exceeds max size")
     if "calldata" not in request_json:
         return bad_request("Missing calldata value")
@@ -67,7 +68,7 @@ def execute(request):
 
     path = "/tmp/execute.sh"
     with open(path, "w") as f:
-        f.write(base64.b64decode(request_json["executable"]).decode())
+        f.write(executable.decode())
 
     os.chmod(path, 0o775)
     try:
