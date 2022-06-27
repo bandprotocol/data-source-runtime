@@ -1,7 +1,7 @@
 /lambda/venv
 /lambda/requirements.txt
-/lambda/lambda-yoda.zip
+/lambda/lambda-executor.zip
 
 /google-cloud-functions/venv
 /google-cloud-functions/requirements.txt
-/google-cloud-functions/google-cloud-function.zip
+/google-cloud-functions/gcf-executor.zip
