@@ -92,7 +92,3 @@ def execute():
         return success(126, "", "", "Execution fail")
     except subprocess.TimeoutExpired:
         return success(111, "", "", "Execution time limit exceeded")
-
-@app.route('/', methods=['GET'])
-def hello_world():
-    return 'Hello there'
