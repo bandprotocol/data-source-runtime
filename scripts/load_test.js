@@ -20,6 +20,8 @@ export default function () {
     "timeout": 10000
   }), { headers: { 'Content-Type': 'application/json' } })
 
+  console.log(res.body)
+
   let success = check(res, {
     "status is 200": (r) => r.status === 200,
   });

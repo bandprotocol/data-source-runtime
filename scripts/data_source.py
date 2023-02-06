@@ -9,6 +9,7 @@ import time
 
 if __name__ == "__main__":
     try:
+        time.sleep(5)
         print(sys.argv[1:])
         print(os.getpid())
         print(globals())
