@@ -15,7 +15,7 @@ EXPOSE 8000
 RUN adduser --system --no-create-home nonroot
 USER nonroot
 
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker", "--workers", "32", "--timeout", "0"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker", "--workers", "2", "--timeout", "10"]
 
 # FOR TESTING ONLY
 # CMD ["uvicorn","app:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
