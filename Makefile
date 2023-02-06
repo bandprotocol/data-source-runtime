@@ -24,4 +24,4 @@ docker:
 	(cd docker && docker compose up --force-recreate --build -d)
 	rm $(CURRENT_DIR)/docker/requirements.txt
 	$(eval IP=$(shell docker inspect --format='{{json .NetworkSettings.Networks.docker_default.IPAddress}}' docker-executor-1 | jq .))
-	@echo "Your local executor's url is "$(IP)":8000"
+	@echo "Your local executor's url is http://"$(IP)":8000"
