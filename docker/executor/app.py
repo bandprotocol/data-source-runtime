@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from flask import jsonify, Flask, request
 import os
 import shlex
 import base64
@@ -9,7 +9,7 @@ import io
 import preload
 
 runtime_version = "docker-executor:0.2.4"
-app = FastAPI()
+app = Flask(__name__)
 
 
 def get_env(env, flag):
@@ -18,24 +18,28 @@ def get_env(env, flag):
     return int(env[flag])
 
 
+def bad_request(err):
+    return jsonify({"error": err}), 400
+
+
 @app.post("/")
-async def execute(request: Request):
+def execute():
     base_env = os.environ.copy()
 
     MAX_EXECUTABLE = get_env(base_env, "MAX_EXECUTABLE")
     MAX_DATA_SIZE = get_env(base_env, "MAX_DATA_SIZE")
 
-    request_json = await request.json()
+    request_json = request.get_json(force=True)
 
     if "executable" not in request_json:
-        raise HTTPException(status_code=400, detail="Missing executable value")
+        raise bad_request("Missing executable value")
     executable = base64.b64decode(request_json["executable"])
     if len(executable) > MAX_EXECUTABLE:
-        raise HTTPException(status_code=400, detail="Executable exceeds max size")
+        raise bad_request("Executable exceeds max size")
     if "calldata" not in request_json:
-        raise HTTPException(status_code=400, detail="Missing calldata value")
+        raise bad_request("Missing calldata value")
     if len(request_json["calldata"]) > MAX_DATA_SIZE:
-        raise HTTPException(status_code=400, detail="Calldata exceeds max size")
+        raise bad_request("Calldata exceeds max size")
 
     res = {
         "returncode": 0,
