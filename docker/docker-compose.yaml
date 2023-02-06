@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  executor:
+    build:
+      context: .
+    restart: always
+    # FOR TESTING ONLY
+    # ports:
+    #   - "8000:8000"
+    # volumes:
+    #   - ./executor:/executor
