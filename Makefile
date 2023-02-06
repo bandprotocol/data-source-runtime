@@ -23,6 +23,6 @@ docker:
 	cat requirements.txt $(CURRENT_DIR)/docker/extra_requirements.txt > $(CURRENT_DIR)/docker/requirements.txt
 	(cd docker && docker compose up --force-recreate --build -d)
 	rm $(CURRENT_DIR)/docker/requirements.txt
+	sleep 5
 	$(eval IP=$(shell docker inspect --format='{{json .NetworkSettings.Networks.docker_default.IPAddress}}' docker-executor-1 | jq .))
-	sleep 10
 	@echo "Your local executor's url is http://"$(IP)":8000"
