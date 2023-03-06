@@ -15,4 +15,4 @@ EXPOSE 8000
 RUN adduser --system --no-create-home nonroot
 USER nonroot
 
-CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "16", "--timeout", "10"]
+CMD ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "1", "--timeout", "10"]
