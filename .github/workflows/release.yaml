@@ -1,0 +1,32 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v[0-9]+.*
+
+jobs:
+  build_zips:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Build zip files
+        run: |
+          make gcf
+          make lambda
+
+          mkdir artifacts
+          cp google-cloud-functions/gcf-executor.zip artifacts/gcf-executor.zip
+          cp lambda/lambda-executor.zip artifacts/lambda-executor.zip
+
+      - name: Create checksums
+        working-directory: artifacts
+        run: sha256sum * > checksums.txt && cat checksums.txt
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/**
