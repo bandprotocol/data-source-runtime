@@ -11,7 +11,7 @@ HEADERS = {
     "access-control-allow-methods": "OPTIONS, POST",
 }
 
-runtime_version = "lambda:2.0.3"
+runtime_version = "${RUNTIME_VERSION}"
 
 
 def success(returncode, stdout, stderr, err):
