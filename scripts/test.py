@@ -3,7 +3,6 @@ import pandas as pd
 import plotly.graph_objects as go
 
 DATASOURCE_IDS = [54, 56, 57, 58, 59, 73, 75, 76, 78, 120, 6, 7, 8, 9, 103, 104, 105, 106]
-SYMBOLS = ["BTC"]
 
 EXECUTOR_URL = "https://us-central1-band-playground.cloudfunctions.net/yoda-executor-test"
 TIMEOUT = 10000
@@ -48,16 +47,17 @@ def get_executor_price(id, calldata):
     return result
 
 
-def get_chain_report_price(id, calldata):
+def get_chain_report(id):
     try:
         query = {
             "query": f"""
             query Reports {{
                 raw_requests(
-                    where: {{ data_source_id: {{ _eq: {id} }}, calldata: {{ _eq: "{calldata}" }} }}
+                    where: {{ data_source_id: {{ _eq: {id} }} }}
                     order_by: {{ request_id: desc }}
                     limit: 1
                 ) {{
+                    calldata
                     raw_reports(limit: 1) {{
                         data
                     }}
@@ -69,10 +69,26 @@ def get_chain_report_price(id, calldata):
         response = requests.post(CHAIN_QUERY_URL, json=query)
         response.raise_for_status()
         result = response.json()
-
+        
         raw_data = ""
+        calldata = ""
         try:
-            raw_hex = result["data"]["raw_requests"][0]["raw_reports"][0]["data"]
+            if "errors" in result:
+                return result["error"]["message"]
+            
+            raw_request = result["data"]["raw_requests"]
+            if len(raw_request) == 0:
+                return "No request data"
+            
+            calldata = raw_request[0]["calldata"]
+            if calldata:
+                calldata = bytes.fromhex(calldata[2:]).decode("utf-8", errors="ignore")
+
+            raw_report = raw_request[0]["raw_reports"]
+            if len(raw_report) == 0:
+                return "No report data"
+            
+            raw_hex = raw_report[0]["data"]
             if raw_hex:
                 raw_data = bytes.fromhex(raw_hex[2:]).decode("utf-8", errors="ignore")
         except (KeyError, IndexError, TypeError) as e:
@@ -81,15 +97,14 @@ def get_chain_report_price(id, calldata):
     except requests.RequestException as e:
         print(f"[ERROR] Failed for id {id}: {e}")
 
-    return raw_data
+    return raw_data, calldata
 
 def main():
     res = []
 
-    calldata = " ".join(SYMBOLS)
     for id in DATASOURCE_IDS:
+        report_price, calldata = get_chain_report(id)
         executor_price = get_executor_price(id, calldata)
-        report_price = get_chain_report_price(id, calldata)
 
         res.append({
             "datasource id": id,
