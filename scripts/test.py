@@ -74,11 +74,11 @@ def get_chain_report(id):
         calldata = ""
         try:
             if "errors" in result:
-                return result["error"]["message"]
+                return result["error"]["message"], ""
             
             raw_request = result["data"]["raw_requests"]
             if len(raw_request) == 0:
-                return "No request data"
+                return "No request data", ""
             
             calldata = raw_request[0]["calldata"]
             if calldata:
@@ -86,7 +86,7 @@ def get_chain_report(id):
 
             raw_report = raw_request[0]["raw_reports"]
             if len(raw_report) == 0:
-                return "No report data"
+                return "No report data", ""
             
             raw_hex = raw_report[0]["data"]
             if raw_hex:
