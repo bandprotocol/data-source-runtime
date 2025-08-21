@@ -3,6 +3,7 @@ import os
 import shlex
 import subprocess
 import base64
+import hashlib
 
 # Set environment flag of MAX_EXECUTABLE, MAX_DATA_SIZE
 
@@ -66,7 +67,8 @@ def execute(request):
     except ValueError:
         return bad_request("Timeout format invalid")
 
-    path = "/tmp/execute.sh"
+    hash = hashlib.sha256(executable).hexdigest().upper()
+    path = f"/tmp/{hash}.sh"
     with open(path, "w") as f:
         f.write(executable.decode())
 
