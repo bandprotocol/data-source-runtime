@@ -1,10 +1,11 @@
 import requests
 import pandas as pd
 import plotly.graph_objects as go
+import concurrent.futures
 
 DATASOURCE_IDS = [54, 56, 57, 58, 59, 73, 75, 76, 78, 120, 6, 7, 8, 9, 103, 104, 105, 106]
 
-EXECUTOR_URL = "https://us-central1-band-playground.cloudfunctions.net/yoda-executor-test"
+EXECUTOR_URL = "https://yoda-executor-1019910606111.asia-southeast1.run.app"
 TIMEOUT = 10000
 ORACLE_BASE_URL = "https://laozi3.bandchain.org/api/oracle/v1"
 CHAIN_QUERY_URL = "https://graphql-lm.bandchain.org/v1/graphql"
@@ -102,16 +103,19 @@ def get_chain_report(id):
 def main():
     res = []
 
-    for id in DATASOURCE_IDS:
+    def process_id(id):
         report_price, calldata = get_chain_report(id)
         executor_price = get_executor_price(id, calldata)
-
-        res.append({
+        return {
             "datasource id": id,
             "symbol": calldata,
             "executor price": executor_price,
             "report price": report_price
-        })
+        }
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        results = list(executor.map(process_id, DATASOURCE_IDS))
+        res.extend(results)
 
     df = pd.DataFrame(res)
 
