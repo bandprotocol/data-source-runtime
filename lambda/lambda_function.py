@@ -3,6 +3,7 @@ import os
 import shlex
 import base64
 import subprocess
+import hashlib
 
 HEADERS = {
     "content-type": "application/json",
@@ -75,7 +76,8 @@ def lambda_handler(event, context):
     except ValueError:
         return bad_request("Timeout format invalid")
 
-    path = "/tmp/execute.sh"
+    hash = hashlib.sha256(executable).hexdigest().upper()
+    path = f"/tmp/{hash}.sh"
     with open(path, "w") as f:
         f.write(executable.decode())
 
