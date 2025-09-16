@@ -1,4 +1,4 @@
-.PHONY: lambda gcf
+.PHONY: lambda gcf docker docker-ip
 
 VERSION=2.0.5
 CURRENT_DIR=$(shell pwd)
@@ -19,3 +19,11 @@ gcf:
 	mv $(CURRENT_DIR)/google-cloud-functions/main.bak $(CURRENT_DIR)/google-cloud-functions/main.py
 	rm $(CURRENT_DIR)/google-cloud-functions/requirements.txt
 
+docker:
+	cat requirements.txt $(CURRENT_DIR)/docker/extra_requirements.txt > $(CURRENT_DIR)/docker/requirements.txt
+	(cd docker && docker compose up --force-recreate --build -d)
+	rm $(CURRENT_DIR)/docker/requirements.txt
+
+docker-ip:
+	$(eval IP=$(shell docker inspect --format='{{json .NetworkSettings.Networks.docker_default.IPAddress}}' docker-executor-1 | jq .))
+	@echo "Your local executor's url is http://"$(IP)":8000"
